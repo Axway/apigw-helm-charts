@@ -1,0 +1,17 @@
+{{- if eq .Values.apimgr.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apimgr.name }}
+  name: {{ .Values.apimgr.name }}-ext
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: {{ .Values.apimgr.name }}
+  ports:
+  - port: {{ .Values.apimgr.trafficPort }}
+    protocol: TCP
+    nodePort: {{ .Values.apimgr.nodePort }}
+{{- end }}

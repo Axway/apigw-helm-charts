@@ -1,0 +1,20 @@
+{{- if eq .Values.apimgr.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apimgr.name }}
+  name: {{ .Values.apimgr.name }}-int
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.apimgr.name }}
+  ports:
+  - name: traffic
+    port: {{ .Values.apimgr.trafficPort }}
+    targetPort: {{ .Values.apimgr.trafficPort }}
+    protocol: TCP
+  sessionAffinity: ClientIP
+  type: ClusterIP
+status:
+{{- end }}

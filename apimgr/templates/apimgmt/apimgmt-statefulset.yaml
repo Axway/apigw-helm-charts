@@ -1,0 +1,112 @@
+{{- if eq .Values.apimgmt.enabled true }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: apimgmt
+  name: apimgmt
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.apimgmt.replicaCount }}
+  selector:
+    matchLabels:
+      app: apimgmt
+  strategy:
+    type: Recreate
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: apimgmt
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - apimgmt
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - args:
+        - {{ .Values.global.gwdir }}/posix/bin/start-emt-instance
+        env:
+        - name: GW_DIR
+          value: {{ .Values.global.gwdir }}
+        - name: GW_TRACE_DIR
+          value: {{ .Values.global.gwdir }}/groups/topologylinks/emt-group-emt-service/trace
+        - name: EMT_ANM_HOSTS
+          value: anm-int:8090
+        - name: EMT_HEAP_SIZE_MB
+          value: "{{ .Values.apimgmt.emt_heap_size_mb }}"
+        - name: APIGW_LOG_TRACE_TO_FILE
+          value: "{{ .Values.apimgmt.logTraceToFile }}"
+        - name: APIGW_LOG_TRACE_JSON_TO_STDOUT
+          value: "{{ .Values.apimgmt.logTraceJSONtoSTDOUT }}"
+        - name: APIGW_LOG_OPENTRAFFIC_OUTPUT
+          value: "{{ .Values.apimgmt.logOpenTrafficOutput }}"
+        - name: EMT_DEPLOYMENT_ENABLED
+          value: "{{ .Values.emtDeployment.enabled }}"
+        image: {{ .Values.global.dockerRegistry }}/{{ .Values.apimgmt.imageName }}:{{ .Values.apigw.imageTag }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        name: apimgmt
+        ports:
+        - containerPort: 8075
+          protocol: TCP
+        resources: {}
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: k8sprobe
+              value: readiness.{{ .Values.apimgmt.name }}
+            path: /healthcheck
+            port: {{ .Values.apimgmt.trafficPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 8
+        livenessProbe:
+          httpGet:
+            httpHeaders:
+            - name: k8sprobe
+              value: liveness.{{ .Values.apimgmt.name }}
+            path: /healthcheck
+            port: {{ .Values.apimgmt.trafficPort }}
+            scheme: HTTPS
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 5
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      initContainers:
+      - name: init-cassandra-0
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host0 }} 9042; do echo waiting for cassandra-0; sleep 2; done;']
+      - name: init-cassandra-1
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host1 }} 9042; do echo waiting for cassandra-1; sleep 2; done;']
+      - name: init-cassandra-2
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host2 }} 9042; do echo waiting for cassandra-2; sleep 2; done;']
+{{- if eq .Values.mysql.enabled true }}
+      - name: init-mysql
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysql.hostname }} {{ .Values.mysql.port }}; do echo waiting for {{ .Values.mysql.hostname }}; sleep 2; done;']
+{{- end }}
+      - name: init-anm
+        image: {{ .Values.global.initImageTag }}
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.anm.name }}-int {{ .Values.anm.trafficPort }}; do echo waiting for anm; sleep 2; done;']
+        dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      terminationGracePeriodSeconds: 30
+{{- end }}
+

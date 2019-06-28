@@ -1,0 +1,18 @@
+{{- if eq .Values.apimgmt.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apimgmt.name }}
+  name: {{ .Values.apimgmt.name }}-ext
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort
+  selector:
+    app: {{ .Values.apimgmt.name }}
+  ports:
+  - port: {{ .Values.apimgmt.trafficPort }}
+    protocol: TCP
+    nodePort: {{ .Values.apimgmt.nodePort }}
+  sessionAffinity: ClientIP
+{{- end }}

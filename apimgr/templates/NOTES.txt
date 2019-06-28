@@ -1,0 +1,40 @@
+#################################################################
+# Thank you for installing {{ .Chart.Name }}.
+# 
+# Your release is named {{ .Release.Name }}.
+#################################################################
+
+   Admin Node Manager
+   -----------------------
+   DockerImageName: {{ .Values.anm.imageName }}
+   Docker TAG:      {{ .Values.apigw.imageTag }}
+
+   Default credentials for Admin Node Manager Interface
+   user: admin
+   password: changeme
+
+
+   API Manager - Management
+   -----------------------------
+   DockerImageName: {{ .Values.apimgmt.imageName }}
+   Docker TAG:      {{ .Values.apigw.imageTag }}
+
+   Default credential for API Manager Console
+   user: apiadmin
+   password: changeme
+
+
+   API Manager - Traffic
+   -----------------------
+   DockerImageName: {{ .Values.apimgr.imageName }}
+   Docker TAG:      {{ .Values.apigw.imageTag }}
+
+For info on all resources in cluster run:
+kubectl get all -n {{ .Values.namespace }}
+
+
+####################################################################
+# 
+# API Gateway Deployed, wait a couple of minutes for DNS to Update
+#
+####################################################################

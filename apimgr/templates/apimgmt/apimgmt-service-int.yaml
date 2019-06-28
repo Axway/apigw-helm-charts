@@ -1,0 +1,19 @@
+{{- if eq .Values.apimgmt.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apimgmt.name }}
+  name: {{ .Values.apimgmt.name }}-int
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.apimgmt.name }}
+  ports:
+  - name: ui
+    port: {{ .Values.apimgmt.trafficPort }}
+    targetPort: {{ .Values.apimgmt.trafficPort }}
+    protocol: TCP
+  sessionAffinity: ClientIP
+  type: ClusterIP
+{{- end }}

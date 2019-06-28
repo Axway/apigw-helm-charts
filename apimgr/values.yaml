@@ -1,0 +1,114 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  # The image used for initContainers
+  initImageTag: "busybox:1.30"
+  # The directory of the apigateway in your image. This should not change unless you altered this during image creation
+  gwdir: /opt/Axway/apigateway
+  # Strategy https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment
+  #  - specifies the strategy used to replace old Pods by new ones
+  #  - .spec.strategy.type can be “Recreate” or “RollingUpdate”
+  #  - "RollingUpdate" is the default value
+  updateStrategy: "RollingUpdate"
+  # Defines when to Pull images. This can be "Always", "IfNotPresent" or "Never".
+  pullPolicy: Always
+  # Docker registry where images are stored.
+  dockerRegistry:
+
+# This is used as the namespace. It is also combined with environ.id and domain to form the cluster name and domain names.
+# It usually defines a user or customer.
+namespace:
+
+# Same TAG for all Images
+apigw:
+   imageTag:
+
+# Most of these values should only be changed if necessary.
+# Admin Node Manager related values
+anm:
+   name: anm
+   # Username and Password should match those configured when building your images
+   adminUsername: admin
+   adminUserPw: changeme
+   # The name of the image stored in your repository
+   imageName:
+   # Should always be 1
+   replicaCount: 1
+   trafficPort: 8090
+   nodePort: 30090
+   logTraceToFile: "true"
+   # Trace to stdout. Can also be used to ship logs to external service.
+   logTraceJSONtoSTDOUT: "true"
+   emt_heap_size_mb: "2048"
+   emt_topology_ttl: 10
+   # Set to true when healthcheck is added to ANM Image
+   probes: true
+
+# Most of these values should only be changed if necessary.
+# API Manager UI related values
+apimgmt:
+   name: apimgmt
+   # Username and Password should match those configured when building your images
+   adminUsername: apiadmin
+   adminUserPw: changeme
+   enabled: true
+   # The name of the image stored in your repository. Same for apimgmt and apimgr
+   imageName:
+   # Can be scaled to more if needed for HA.
+   replicaCount: 1
+   trafficPort: 8075
+   nodePort: 30075
+   logTraceToFile: "true"
+   # Trace to stdout. Required for logs to go to s3 bucket. Can also be used to ship logs to other external service.
+   logTraceJSONtoSTDOUT: "true"
+   logOpenTrafficOutput: "stdout"
+   emt_heap_size_mb: "1024"
+
+# Most of these values should only be changed if necessary.
+# API Gateway Traffic related values
+apimgr:
+   name: apimgr
+   enabled: true
+   # The name of the image stored in your repository. Same for apimgmt and apimgr
+   imageName:
+   trafficPort: 8065
+   nodePort: 30065
+   # Whether to make Oauth port available or not. Must be configured in fed as well.
+   Oauth:
+     name: apimgr-oauth
+     enabled: false
+     trafficPort: 8089
+     nodePort: 30089
+   replicaCount: 3
+   logTraceToFile: "true"
+   logTraceJSONtoSTDOUT: "true"
+   logOpenTrafficOutput: "stdout"
+   emt_heap_size_mb: "1512"
+   test_import: false
+
+mysql:
+  enabled: true
+  # Hostname for the RDS. Used for testing host is up but also configures it in the FED using environment variables.
+  # If not using environment variables in FED these need to match vallues set in the FED
+  hostname: mysql-host
+  databaseName: "Axway"
+  username: "apigateway"
+  password: "changeme"
+  port: 3306
+  # Used in configuring mysql tables
+  imageName: "mysql"
+  # version of mysql your database is running
+  imageTag: "5.7"
+
+# Enable ability to deploy a FED to a running environment
+# WARNING: Should only be used for test environments, Never for production
+emtDeployment:
+   enabled: true
+
+# Cassandra Keyspace and Hostnames. Used for testing hosts are up but also configures them in the FED using
+# environment variables. If not using environment variables in FED these need to match values set in the FED
+cassandra:
+   host0: cassandra-0
+   host1: cassandra-1
+   host2: cassandra-2
