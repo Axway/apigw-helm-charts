@@ -15,11 +15,15 @@ spec:
     type: Recreate
   updateStrategy:
     type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
         app: {{ .Values.apimgr.name }}
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.imageCredentials.name }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -40,6 +44,8 @@ spec:
           value: {{ .Values.global.gwdir }}
         - name: GW_TRACE_DIR
           value: {{ .Values.global.gwdir }}/groups/topologylinks/emt-group-emt-service/trace
+        - name: CASS0
+          value: {{ .Values.cassandra.host0 }}
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}-int:{{ .Values.anm.trafficPort }}
         - name: EMT_HEAP_SIZE_MB
@@ -58,23 +64,25 @@ spec:
         ports:
         - containerPort: {{ .Values.apimgr.trafficPort }}
           protocol: TCP
-{{- if eq .Values.apimgr.Oauth.enabled true }}
-        - containerPort: {{ .Values.apimgr.Oauth.trafficPort }}
-          protocol: TCP
+{{- if eq .Values.quotas.enabled true }}
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: 2
+          requests:
+            memory: "1.5Gi"
+            cpu: 1.5
 {{- end }}
-        #resources:
-        #  limits:
-        #    memory: "1512Mi"
         readinessProbe:
           httpGet:
             httpHeaders:
             - name: k8sprobe
               value: readiness.{{ .Values.apimgr.name }}
             path: /healthcheck
-            port: {{ .Values.apimgr.trafficPort }}
-            scheme: HTTPS
-          initialDelaySeconds: 60
-          periodSeconds: 30
+            port: {{ .Values.apimgr.openPort }}
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
           failureThreshold: 5
         livenessProbe:
           httpGet:
@@ -82,10 +90,10 @@ spec:
             - name: k8sprobe
               value: liveness.{{ .Values.apimgr.name }}
             path: /healthcheck
-            port: {{ .Values.apimgr.trafficPort }}
-            scheme: HTTPS
-          initialDelaySeconds: 60
-          periodSeconds: 30
+            port: {{ .Values.apimgr.openPort }}
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
           failureThreshold: 5
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
@@ -93,12 +101,12 @@ spec:
       - name: init1
         image: {{ .Values.global.initImageTag }}
         command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host0 }} 9042; do echo waiting for {{ .Values.cassandra.host0 }}; sleep 2; done;']
-      - name: init2
-        image: {{ .Values.global.initImageTag }}
-        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host1 }} 9042; do echo waiting for {{ .Values.cassandra.host1 }}; sleep 2; done;']
-      - name: init3
-        image: {{ .Values.global.initImageTag }}
-        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host2 }} 9042; do echo waiting for {{ .Values.cassandra.host2 }}; sleep 2; done;']
+      # - name: init2
+      #   image: {{ .Values.global.initImageTag }}
+      #   command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host1 }} 9042; do echo waiting for {{ .Values.cassandra.host1 }}; sleep 2; done;']
+      # - name: init3
+      #   image: {{ .Values.global.initImageTag }}
+      #   command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host2 }} 9042; do echo waiting for {{ .Values.cassandra.host2 }}; sleep 2; done;']
 {{- if eq .Values.mysql.enabled true }}
       - name: init4
         image: {{ .Values.global.initImageTag }}

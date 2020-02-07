@@ -1,0 +1,16 @@
+{{- if eq .Values.quotas.enabled true }}
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mem-cpu-limit-range
+  namespace: {{ .Values.namespace }}
+spec:
+  limits:
+  - default:
+      memory: {{ .Values.quotas.containermemory }}
+      cpu: {{ .Values.quotas.containercpu }}
+    defaultRequest:
+      cpu: "200m"
+      memory: "250Mi"
+    type: Container
+{{- end }}

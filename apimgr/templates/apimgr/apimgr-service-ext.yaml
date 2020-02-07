@@ -1,4 +1,4 @@
-{{- if eq .Values.apimgr.enabled true }}
+{{- if and (eq .Values.apimgr.enabled true) (eq .Values.nodeport.enabled true) }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,7 +11,12 @@ spec:
   selector:
     app: {{ .Values.apimgr.name }}
   ports:
-  - port: {{ .Values.apimgr.trafficPort }}
+  - name: http{{ .Values.apimgr.trafficPort }}
+    port: {{ .Values.apimgr.trafficPort }}
     protocol: TCP
     nodePort: {{ .Values.apimgr.nodePort }}
+  - name: http{{ .Values.apimgr.openPort }}
+    port: {{ .Values.apimgr.openPort }}
+    protocol: TCP
+    nodePort: {{ .Values.apimgr.nodePortOpen }}
 {{- end }}

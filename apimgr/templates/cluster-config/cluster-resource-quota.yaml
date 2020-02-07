@@ -1,0 +1,11 @@
+{{- if eq .Values.quotas.enabled true }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: mem-cpu-quota
+  namespace: {{ .Values.namespace }}
+spec:
+  hard:
+    limits.cpu: {{ .Values.quotas.cpu }}
+    limits.memory: {{ .Values.quotas.memory }}
+{{- end }}

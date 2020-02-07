@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    apigw.cmd: apigw convert -f docker-emt-aws-API-Metrics.yml
+    apigw.version: 1.7.0 (767ab4b)
+  creationTimestamp: null
+  labels:
+    io.apigw.service: {{ .Values.mysql.hostname }}
+  name: mysql
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.mysql.replicaCount }}
+  selector:
+    matchLabels:
+      io.apigw.service: {{ .Values.mysql.hostname }}
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.apigw.service: {{ .Values.mysql.hostname }}
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysql.databaseName }}
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{ .Values.mysql.password }}
+        - name: MYSQL_USER
+          value: {{ .Values.mysql.username }}
+        - name: MYSQL_PASSWORD
+          value: {{ .Values.mysql.password }}
+        image: {{ .Values.mysql.imageName }}:{{ .Values.mysql.imageTag }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        name: mysql
+        ports:
+        - containerPort: 3306
+          protocol: TCP
+        resources: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

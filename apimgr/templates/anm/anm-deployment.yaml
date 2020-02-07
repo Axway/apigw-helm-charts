@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
@@ -7,6 +7,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.anm.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.anm.name }}
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -19,6 +22,8 @@ spec:
       labels:
         app: {{ .Values.anm.name }}
     spec:
+      imagePullSecrets:
+        - name: {{ .Values.imageCredentials.name }}
       containers:
       - args:
         - {{ .Values.global.gwdir }}/posix/bin/start-emt-nodemanager
@@ -42,6 +47,13 @@ spec:
         - containerPort: {{ .Values.anm.trafficPort }}
           protocol: TCP
 {{- if eq .Values.anm.probes true }}
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+          requests:
+            memory: "1Gi"
+            cpu: "250m"      
         livenessProbe:
           httpGet:
             httpHeaders:
@@ -69,7 +81,7 @@ spec:
         terminationMessagePolicy: File
         resources:
           limits:
-            memory: "1024Mi"
+            memory: "1Gi"
 {{- if eq .Values.mysql.enabled true }}
       initContainers:
       - name: init-mysql
