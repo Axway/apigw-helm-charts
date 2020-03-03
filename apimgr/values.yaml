@@ -100,6 +100,10 @@ mysql:
   imageName: "mysql"
   # version of mysql your database is running
   imageTag: "5.7"
+  # A secret that contains the password for the mysql instance Key = mysql-password
+  existingSecret: ""
+  # Only run migrations if needed
+  init: false
 
 # Enable ability to deploy a FED to a running environment
 # WARNING: Should only be used for test environments, Never for production
