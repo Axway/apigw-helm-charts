@@ -1,0 +1,23 @@
+{{- if and (eq .Values.nodeport.enabled false) (eq .Values.apimgmt.enabled true) }}   
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.apimgmt.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.apimgmt.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+  rules:
+  - host: {{ .Values.apimgmt.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+    http:
+      paths: 
+      - backend:
+          serviceName: {{ .Values.apimgmt.name }}-int
+          servicePort: {{ .Values.apimgmt.trafficPort }}
+
+{{- end }} 

@@ -1,0 +1,43 @@
+{{- if and (eq .Values.nodeport.enabled false) (eq .Values.apimgr.enabled true) }}   
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.apimgr.name }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.apimgr.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+  rules:
+  - host: {{ .Values.apimgr.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+    http:
+      paths: 
+      - backend:
+          serviceName: {{ .Values.apimgr.name }}-int
+          servicePort: {{ .Values.apimgr.trafficPort }}
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.apimgr.name }}{{ .Values.apimgr.openPort }}
+  namespace: {{ .Values.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.apimgr.name }}{{ .Values.apimgr.openPort }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+  rules:
+  - host: {{ .Values.apimgr.name }}{{ .Values.apimgr.openPort }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+    http:
+      paths: 
+      - backend:
+          serviceName: {{ .Values.apimgr.name }}-int
+          servicePort: {{ .Values.apimgr.openPort }}
+
+{{- end }} 

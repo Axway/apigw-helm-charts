@@ -1,4 +1,4 @@
-{{- if eq .Values.apimgmt.enabled true }}
+{{- if and (eq .Values.apimgmt.enabled true) (eq .Values.nodeport.enabled true) }}
 apiVersion: v1
 kind: Service
 metadata:

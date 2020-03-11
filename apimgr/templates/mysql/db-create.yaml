@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: db-create-mysql-apigw-{{ uuidv4 }}
+  name: db-create-mysql-apigw
   namespace: {{ .Values.namespace }}
   labels:  
     heritage: {{ .Release.Service }}
@@ -21,6 +21,12 @@ spec:
       volumeMounts:
       - name: config-volume
         mountPath: /tmp/mysql
+{{- if eq .Values.mysql.enabled true }}
+   initContainers:
+   - name: init-mysql
+     image: {{ .Values.global.initImageTag }}
+     command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysql.hostname }} {{ .Values.mysql.port }}; do echo waiting for mysql; sleep 2; done;']
+{{- end }}
    volumes:
     - name: config-volume
       configMap:

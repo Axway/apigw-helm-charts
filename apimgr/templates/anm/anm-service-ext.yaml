@@ -1,3 +1,4 @@
+{{- if eq .Values.nodeport.enabled true }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -13,3 +14,4 @@ spec:
   - port: {{ .Values.anm.trafficPort }}
     protocol: TCP
     nodePort: {{ .Values.anm.nodePort }}
+{{- end }}

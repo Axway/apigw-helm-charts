@@ -14,15 +14,34 @@ global:
   # Defines when to Pull images. This can be "Always", "IfNotPresent" or "Never".
   pullPolicy: Always
   # Docker registry where images are stored.
-  dockerRegistry:
+  dockerRegistry: <Docker_registry_hostname>
 
 # This is used as the namespace. It is also combined with environ.id and domain to form the cluster name and domain names.
 # It usually defines a user or customer.
-namespace:
+namespace: 
 
-# Same TAG for all Images
+# Horizontal K8s pods autoscaling setting with min/max pods and average CPU utilization in %
+autoscaling:
+   enabled: true
+   minReplicas: 2
+   maxReplicas: 12
+   averageUtilization: 75
+
+# Resource quotas per cluster
+quotas:
+   enabled: true
+   cpu: 12
+   memory: 24Gi
+   containercpu: 2
+   containermemory: 2Gi
+
+# If you want to enable NodePort (set to true) instead of Ingress (set to false) to externalize access to APIM components
+nodeport:
+   enabled: true
+
+# Same TAG for all Images. For example: my.docker-registry.com/apim-demo/apimgt-demo:7.7-SP1-01
 apigw:
-   imageTag:
+   imageTag: "7.7-SP1-01"
 
 # Most of these values should only be changed if necessary.
 # Admin Node Manager related values
@@ -31,8 +50,8 @@ anm:
    # Username and Password should match those configured when building your images
    adminUsername: admin
    adminUserPw: changeme
-   # The name of the image stored in your repository
-   imageName:
+   # The name of the image stored in your repository (an example name is shown)
+   imageName: "apim-demo/anm-demo"
    # Should always be 1
    replicaCount: 1
    trafficPort: 8090
@@ -43,7 +62,7 @@ anm:
    emt_heap_size_mb: "2048"
    emt_topology_ttl: 10
    # Set to true when healthcheck is added to ANM Image
-   probes: true
+   probes: false
 
 # Most of these values should only be changed if necessary.
 # API Manager UI related values
@@ -53,14 +72,15 @@ apimgmt:
    adminUsername: apiadmin
    adminUserPw: changeme
    enabled: true
-   # The name of the image stored in your repository. Same for apimgmt and apimgr
-   imageName:
-   # Can be scaled to more if needed for HA.
+   # The name of the image stored in your repository. Same for apimgmt and apimgr  (an example name is shown)
+   imageName: "apim-demo/apimgt-demo"
+   # One replica should be sufficient for most configurations, but it can be scaled to more if needed for HA.
    replicaCount: 1
    trafficPort: 8075
    nodePort: 30075
+   openPort: 8080
    logTraceToFile: "true"
-   # Trace to stdout. Required for logs to go to s3 bucket. Can also be used to ship logs to other external service.
+   # Trace to stdout. Can be used to ship logs to other external service.
    logTraceJSONtoSTDOUT: "true"
    logOpenTrafficOutput: "stdout"
    emt_heap_size_mb: "1024"
@@ -70,17 +90,14 @@ apimgmt:
 apimgr:
    name: apimgr
    enabled: true
-   # The name of the image stored in your repository. Same for apimgmt and apimgr
-   imageName:
+   # The name of the image stored in your repository. Same for apimgmt and apimgr  (an example name is shown)
+   imageName: "apim-demo/apimgt-demo"
    trafficPort: 8065
    nodePort: 30065
-   # Whether to make Oauth port available or not. Must be configured in fed as well.
-   Oauth:
-     name: apimgr-oauth
-     enabled: false
-     trafficPort: 8089
-     nodePort: 30089
-   replicaCount: 3
+   # As an example, we open an additional HTTP port
+   openPort: 8080
+   nodePortOpen: 30080
+   replicaCount: 2
    logTraceToFile: "true"
    logTraceJSONtoSTDOUT: "true"
    logOpenTrafficOutput: "stdout"
@@ -91,24 +108,36 @@ mysql:
   enabled: true
   # Hostname for the RDS. Used for testing host is up but also configures it in the FED using environment variables.
   # If not using environment variables in FED these need to match vallues set in the FED
-  hostname: mysql-host
+  hostname: mysql
   databaseName: "Axway"
   username: "apigateway"
   password: "changeme"
   port: 3306
+  replicaCount: 1
   # Used in configuring mysql tables
   imageName: "mysql"
   # version of mysql your database is running
   imageTag: "5.7"
 
 # Enable ability to deploy a FED to a running environment
-# WARNING: Should only be used for test environments, Never for production
+# WARNING: Should only be used for test environments with ONLY 1 API Gateway pod!!!, Never for production
 emtDeployment:
-   enabled: true
+   enabled: false
 
 # Cassandra Keyspace and Hostnames. Used for testing hosts are up but also configures them in the FED using
 # environment variables. If not using environment variables in FED these need to match values set in the FED
+# For simple "demo" deployment we use only one host - host0. If you plan to use a cluster of 3 nodes, you need to uncomment
+# a section of Helm chart (for apimgr and apimgmt) where we run initContainer tests for Cassandra hosts
+cassandraLocation: "off-cluster" 
 cassandra:
-   host0: cassandra-0
-   host1: cassandra-1
-   host2: cassandra-2
+   host0: 
+   host1:
+   host2:
+
+imageCredentials:
+  name: regsecret
+  registry: <Docker_registry_hostname>
+  # username is the username for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
+  username: 
+  # password is the password for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
+  password: 
