@@ -13,7 +13,7 @@ Make sure you meet the following prerequisites before deploying these Helm chart
 - Kubernetes cluster built - we use kops to build our clusters in AWS, but this chart should work on any cluster, regardless of how it should be built.
 - FED configured - FED should be configured using Policy Studio. Some of the settings, such as Cassandra and MySQL need to match the variables provided to the helm charts. More info to follow.
 - Images built using EMT Scripts and pushed to your Docker Registry
-- Helm installed and initialized
+- Helm installed and initialized. **The chart was tested with Helm v3.1.1.**
 - Cassandra node or cluster configured. Note, that we use an environment variable inside our FED called **CASS0** to pass a Cassandra's host name. The variable is set in two Helm charts: *apimgmt-statefulset.yaml* and *apimgr-deployment.yaml*
 ![Cassandra hostname env. variable](./images/img01.png)
 - (Optional) MySQL Configured
