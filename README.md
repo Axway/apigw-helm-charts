@@ -9,7 +9,7 @@ The Helm charts provided here contain all the Kubernetes manifest files required
 Make sure you meet the following prerequisites before deploying these Helm charts:
 
 - As stated some familiarity with Kubernetes tools is required as well as knowledge of the gateway setup such as FED configuration. 
-- Kubectl installed. **This Helm chart was tested with v1.17.2.**
+- Kubectl installed. **This Helm chart was tested with K8s v1.17.2.**
 - Kubernetes cluster built - we use kops to build our clusters in AWS, but this chart should work on any cluster, regardless of how it should be built.
 - FED configured - FED should be configured using Policy Studio. Some of the settings, such as Cassandra and MySQL need to match the variables provided to the helm charts. More info to follow.
 - Images built using EMT Scripts and pushed to your Docker Registry
