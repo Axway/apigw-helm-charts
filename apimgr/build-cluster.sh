@@ -8,6 +8,6 @@ echo "***************"
 
 # Run helm install with provided values
 
-helm install --values values.yaml --name=${RUNID} --set namespace=${RUNID},cassandra.host0=$(hostname -i),ingress.host=$(hostname -i) --set imageCredentials.username=$USER --set imageCredentials.password=$PASS .
+helm install ${RUNID} --values values.yaml --set namespace=${RUNID},cassandra.host0=$(hostname -i),ingress.host=$(hostname -i) --set imageCredentials.username=$USER --set imageCredentials.password=$PASS .
 
 

@@ -14,8 +14,6 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
-      minReadySeconds: 120
-      progressDeadlineSeconds : 140
     type: {{ .Values.global.updateStrategy }}
   template:
     metadata:

@@ -25,7 +25,7 @@ autoscaling:
    enabled: true
    minReplicas: 2
    maxReplicas: 12
-   averageUtilization: 50
+   averageUtilization: 75
 
 # Resource quotas per cluster
 quotas:

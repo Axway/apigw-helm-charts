@@ -12,11 +12,10 @@ spec:
     matchLabels:
       app: {{ .Values.apimgr.name }}
   strategy:
-    type: Recreate
-  updateStrategy:
-    type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
+      maxSurge: 1
+      maxUnavailable: 0
+    type: {{ .Values.global.updateStrategy }}
   template:
     metadata:
       labels:

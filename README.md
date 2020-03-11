@@ -9,12 +9,12 @@ The Helm charts provided here contain all the Kubernetes manifest files required
 Make sure you meet the following prerequisites before deploying these Helm charts:
 
 - As stated some familiarity with Kubernetes tools is required as well as knowledge of the gateway setup such as FED configuration. 
-- Kubectl installed
+- Kubectl installed. **This Helm chart was tested with v1.17.2.**
 - Kubernetes cluster built - we use kops to build our clusters in AWS, but this chart should work on any cluster, regardless of how it should be built.
 - FED configured - FED should be configured using Policy Studio. Some of the settings, such as Cassandra and MySQL need to match the variables provided to the helm charts. More info to follow.
 - Images built using EMT Scripts and pushed to your Docker Registry
 - Helm installed and initialized
-- Cassandra node or cluster configured. Note, that we use an environment variable inside our FED called **CASS0** to pass a Cassandra's host name
+- Cassandra node or cluster configured. Note, that we use an environment variable inside our FED called **CASS0** to pass a Cassandra's host name. The variable is set in two Helm charts: *apimgmt-statefulset.yaml* and *apimgr-deployment.yaml*
 ![Cassandra hostname env. variable](./images/img01.png)
 - (Optional) MySQL Configured
 
