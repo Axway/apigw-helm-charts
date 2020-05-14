@@ -1,22 +1,22 @@
-{{- if and (eq .Values.api-traffic.enabled true) (eq .Values.nodeport.enabled true) }}
+{{- if and (eq .Values.apiTraffic.enabled true) (eq .Values.nodeport.enabled true) }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: {{ .Values.api-traffic.name }}
-  name: {{ .Values.api-traffic.name }}-ext
+    app: {{ .Values.apiTraffic.name }}
+  name: {{ .Values.apiTraffic.name }}-ext
   namespace: {{ .Values.namespace }}
 spec:
   type: NodePort
   selector:
-    app: {{ .Values.api-traffic.name }}
+    app: {{ .Values.apiTraffic.name }}
   ports:
-  - name: http{{ .Values.api-traffic.trafficPort }}
-    port: {{ .Values.api-traffic.trafficPort }}
+  - name: http{{ .Values.apiTraffic.trafficPort }}
+    port: {{ .Values.apiTraffic.trafficPort }}
     protocol: TCP
-    nodePort: {{ .Values.api-traffic.nodePort }}
-  - name: http{{ .Values.api-traffic.openPort }}
-    port: {{ .Values.api-traffic.openPort }}
+    nodePort: {{ .Values.apiTraffic.nodePort }}
+  - name: http{{ .Values.apiTraffic.openPort }}
+    port: {{ .Values.apiTraffic.openPort }}
     protocol: TCP
-    nodePort: {{ .Values.api-traffic.nodePortOpen }}
+    nodePort: {{ .Values.apiTraffic.nodePortOpen }}
 {{- end }}
