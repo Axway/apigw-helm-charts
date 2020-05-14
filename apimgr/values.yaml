@@ -14,7 +14,7 @@ global:
   # Defines when to Pull images. This can be "Always", "IfNotPresent" or "Never".
   pullPolicy: Always
   # Docker registry where images are stored.
-  dockerRegistry: <Docker_registry_hostname>
+  dockerRegistry: docker-registry.demo.axway.com
 
 # This is used as the namespace. It is also combined with environ.id and domain to form the cluster name and domain names.
 # It usually defines a user or customer.
@@ -25,7 +25,7 @@ autoscaling:
    enabled: true
    minReplicas: 2
    maxReplicas: 12
-   averageUtilization: 75
+   averageUtilization: 50
 
 # Resource quotas per cluster
 quotas:
@@ -37,11 +37,11 @@ quotas:
 
 # If you want to enable NodePort (set to true) instead of Ingress (set to false) to externalize access to APIM components
 nodeport:
-   enabled: true
+   enabled: false
 
-# Same TAG for all Images. For example: my.docker-registry.com/apim-demo/apimgt-demo:7.7-SP1-01
+# Same TAG for all Images
 apigw:
-   imageTag: "7.7-SP1-01"
+   imageTag: "7.7.20200330-01"
 
 # Most of these values should only be changed if necessary.
 # Admin Node Manager related values
@@ -50,7 +50,7 @@ anm:
    # Username and Password should match those configured when building your images
    adminUsername: admin
    adminUserPw: changeme
-   # The name of the image stored in your repository (an example name is shown)
+   # The name of the image stored in your repository
    imageName: "apim-demo/anm-demo"
    # Should always be 1
    replicaCount: 1
@@ -72,7 +72,7 @@ apimgmt:
    adminUsername: apiadmin
    adminUserPw: changeme
    enabled: true
-   # The name of the image stored in your repository. Same for apimgmt and apimgr  (an example name is shown)
+   # The name of the image stored in your repository. Same for apimgmt and apimgr
    imageName: "apim-demo/apimgt-demo"
    # One replica should be sufficient for most configurations, but it can be scaled to more if needed for HA.
    replicaCount: 1
@@ -90,14 +90,14 @@ apimgmt:
 apimgr:
    name: apimgr
    enabled: true
-   # The name of the image stored in your repository. Same for apimgmt and apimgr  (an example name is shown)
+   # The name of the image stored in your repository. Same for apimgmt and apimgr
    imageName: "apim-demo/apimgt-demo"
    trafficPort: 8065
    nodePort: 30065
    # As an example, we open an additional HTTP port
    openPort: 8080
    nodePortOpen: 30080
-   replicaCount: 2
+   replicaCount: 1
    logTraceToFile: "true"
    logTraceJSONtoSTDOUT: "true"
    logOpenTrafficOutput: "stdout"
@@ -136,7 +136,7 @@ cassandra:
 
 imageCredentials:
   name: regsecret
-  registry: <Docker_registry_hostname>
+  registry: docker-registry.demo.axway.com
   # username is the username for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
   username: 
   # password is the password for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
