@@ -1,22 +1,22 @@
-{{- if eq .Values.apiTraffic.enabled true }}
+{{- if eq .Values.apitraffic.enabled true }}
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: {{ .Values.apiTraffic.name }}
-  name: {{ .Values.apiTraffic.name }}-int
+    app: {{ .Values.apitraffic.name }}
+  name: {{ .Values.apitraffic.name }}-int
   namespace: {{ .Values.namespace }}
 spec:
   selector:
-    app: {{ .Values.apiTraffic.name }}
+    app: {{ .Values.apitraffic.name }}
   ports:
   - name: traffic
-    port: {{ .Values.apiTraffic.trafficPort }}
-    targetPort: {{ .Values.apiTraffic.trafficPort }}
+    port: {{ .Values.apitraffic.trafficPort }}
+    targetPort: {{ .Values.apitraffic.trafficPort }}
     protocol: TCP
   - name: open
-    port: {{ .Values.apiTraffic.openPort }}
-    targetPort: {{ .Values.apiTraffic.openPort }}
+    port: {{ .Values.apitraffic.openPort }}
+    targetPort: {{ .Values.apitraffic.openPort }}
     protocol: TCP
   sessionAffinity: ClientIP
   type: ClusterIP

@@ -72,7 +72,7 @@ apimgmt:
    adminUsername: apiadmin
    adminUserPw: changeme
    enabled: true
-   # The name of the image stored in your repository. Same for apimgmt and apiTraffic  (an example name is shown)
+   # The name of the image stored in your repository. Same for apimgmt and apitraffic  (an example name is shown)
    imageName: "apim-demo/apimgt-demo"
    # One replica should be sufficient for most configurations, but it can be scaled to more if needed for HA.
    replicaCount: 1
@@ -87,10 +87,10 @@ apimgmt:
 
 # Most of these values should only be changed if necessary.
 # API Gateway Traffic related values
-apiTraffic:
-   name: apiTraffic
+apitraffic:
+   name: apitraffic
    enabled: true
-   # The name of the image stored in your repository. Same for apimgmt and apiTraffic  (an example name is shown)
+   # The name of the image stored in your repository. Same for apimgmt and apitraffic  (an example name is shown)
    imageName: "apim-demo/apimgt-demo"
    trafficPort: 8065
    nodePort: 30065
@@ -127,7 +127,7 @@ emtDeployment:
 # Cassandra Keyspace and Hostnames. Used for testing hosts are up but also configures them in the FED using
 # environment variables. If not using environment variables in FED these need to match values set in the FED
 # For simple "demo" deployment we use only one host - host0. If you plan to use a cluster of 3 nodes, you need to uncomment
-# a section of Helm chart (for apiTraffic and apimgmt) where we run initContainer tests for Cassandra hosts
+# a section of Helm chart (for apitraffic and apimgmt) where we run initContainer tests for Cassandra hosts
 cassandraLocation: "off-cluster" 
 cassandra:
    host0: 

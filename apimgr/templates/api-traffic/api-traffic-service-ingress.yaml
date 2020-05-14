@@ -1,8 +1,8 @@
-{{- if and (eq .Values.nodeport.enabled false) (eq .Values.apiTraffic.enabled true) }}   
+{{- if and (eq .Values.nodeport.enabled false) (eq .Values.apitraffic.enabled true) }}   
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Values.apiTraffic.name }}
+  name: {{ .Values.apitraffic.name }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -11,19 +11,19 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apiTraffic.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+    - {{ .Values.apitraffic.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
   rules:
-  - host: {{ .Values.apiTraffic.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+  - host: {{ .Values.apitraffic.name }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
     http:
       paths: 
       - backend:
-          serviceName: {{ .Values.apiTraffic.name }}-int
-          servicePort: {{ .Values.apiTraffic.trafficPort }}
+          serviceName: {{ .Values.apitraffic.name }}-int
+          servicePort: {{ .Values.apitraffic.trafficPort }}
 ---
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Values.apiTraffic.name }}{{ .Values.apiTraffic.openPort }}
+  name: {{ .Values.apitraffic.name }}{{ .Values.apitraffic.openPort }}
   namespace: {{ .Values.namespace }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -31,13 +31,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.apiTraffic.name }}{{ .Values.apiTraffic.openPort }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+    - {{ .Values.apitraffic.name }}{{ .Values.apitraffic.openPort }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
   rules:
-  - host: {{ .Values.apiTraffic.name }}{{ .Values.apiTraffic.openPort }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
+  - host: {{ .Values.apitraffic.name }}{{ .Values.apitraffic.openPort }}.{{ .Values.namespace }}.{{ .Values.ingress.host }}.nip.io
     http:
       paths: 
       - backend:
-          serviceName: {{ .Values.apiTraffic.name }}-int
-          servicePort: {{ .Values.apiTraffic.openPort }}
+          serviceName: {{ .Values.apitraffic.name }}-int
+          servicePort: {{ .Values.apitraffic.openPort }}
 
 {{- end }} 
