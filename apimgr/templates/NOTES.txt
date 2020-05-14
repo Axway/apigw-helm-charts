@@ -26,7 +26,7 @@
 
    API Manager - Traffic
    -----------------------
-   DockerImageName: {{ .Values.apimgr.imageName }}
+   DockerImageName: {{ .Values.api-traffic.imageName }}
    Docker TAG:      {{ .Values.apigw.imageTag }}
 
 For info on all resources in cluster run:
