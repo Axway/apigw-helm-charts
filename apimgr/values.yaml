@@ -14,7 +14,7 @@ global:
   # Defines when to Pull images. This can be "Always", "IfNotPresent" or "Never".
   pullPolicy: Always
   # Docker registry where images are stored.
-  dockerRegistry: <Docker_registry_hostname>
+  dockerRegistry: docker-registry.demo.axway.com
 
 # This is used as the namespace. It is also combined with environ.id and domain to form the cluster name and domain names.
 # It usually defines a user or customer.
@@ -41,7 +41,7 @@ nodeport:
 
 # Same TAG for all Images. For example: my.docker-registry.com/apim-demo/apimgt-demo:7.7-SP1-01
 apigw:
-   imageTag: "7.7-SP1-01"
+   imageTag: "7.7.20200330-01"
 
 # Most of these values should only be changed if necessary.
 # Admin Node Manager related values
@@ -136,7 +136,7 @@ cassandra:
 
 imageCredentials:
   name: regsecret
-  registry: <Docker_registry_hostname>
+  registry: docker-registry.demo.axway.com
   # username is the username for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
   username: 
   # password is the password for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
