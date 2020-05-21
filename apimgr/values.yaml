@@ -20,7 +20,7 @@ autoscaling:
    enabled: true
    minReplicas: 2
    maxReplicas: 12
-   averageUtilization: 50
+   averageUtilization: 75
 
 # If you want to enable NodePort (set to true) instead of Ingress (set to false) to externalize access to APIM components
 nodeport:
