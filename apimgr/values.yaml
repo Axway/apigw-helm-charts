@@ -6,15 +6,10 @@ global:
   initImageTag: "busybox:1.30"
   # The directory of the apigateway in your image. This should not change unless you altered this during image creation
   gwdir: /opt/Axway/apigateway
-  # Strategy https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#updating-a-deployment
-  #  - specifies the strategy used to replace old Pods by new ones
-  #  - .spec.strategy.type can be “Recreate” or “RollingUpdate”
-  #  - "RollingUpdate" is the default value
-  updateStrategy: "RollingUpdate"
   # Defines when to Pull images. This can be "Always", "IfNotPresent" or "Never".
   pullPolicy: Always
   # Docker registry where images are stored.
-  dockerRegistry: docker-registry.demo.axway.com
+  dockerRegistry: <Docker_registry_hostname>
 
 # This is used as the namespace. It is also combined with environ.id and domain to form the cluster name and domain names.
 # It usually defines a user or customer.
@@ -26,14 +21,6 @@ autoscaling:
    minReplicas: 2
    maxReplicas: 12
    averageUtilization: 75
-
-# Resource quotas per cluster
-quotas:
-   enabled: true
-   cpu: 12
-   memory: 24Gi
-   containercpu: 2
-   containermemory: 2Gi
 
 # If you want to enable NodePort (set to true) instead of Ingress (set to false) to externalize access to APIM components
 nodeport:
@@ -136,7 +123,7 @@ cassandra:
 
 imageCredentials:
   name: regsecret
-  registry: docker-registry.demo.axway.com
+  registry: <Docker_registry_hostname>
   # username is the username for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
   username: 
   # password is the password for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line

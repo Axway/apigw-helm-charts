@@ -62,7 +62,6 @@ spec:
         ports:
         - containerPort: {{ .Values.apimgmt.trafficPort }}
           protocol: TCP
-{{- if eq .Values.quotas.enabled true }}
         resources:
           limits:
             memory: "2Gi"
@@ -70,7 +69,6 @@ spec:
           requests:
             memory: "1Gi"
             cpu: "500m"      
-{{- end }}
         readinessProbe:
           httpGet:
             httpHeaders:
@@ -93,7 +91,8 @@ spec:
             port: {{ .Values.apimgmt.openPort }}
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          # Adjust periodSeconds for your environment. For demo purpose, this parm is set to a high value
+          periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
           failureThreshold: 5

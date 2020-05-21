@@ -62,15 +62,13 @@ spec:
         ports:
         - containerPort: {{ .Values.apitraffic.trafficPort }}
           protocol: TCP
-{{- if eq .Values.quotas.enabled true }}
         resources:
           limits:
             memory: "2Gi"
             cpu: 2
           requests:
-            memory: "1.5Gi"
-            cpu: 1.5
-{{- end }}
+            memory: "0.5Gi"
+            cpu: 0.5
         readinessProbe:
           httpGet:
             httpHeaders:
@@ -91,7 +89,8 @@ spec:
             port: {{ .Values.apitraffic.openPort }}
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          # Adjust periodSeconds for your environment. For demo purpose, this parm is set to a high value
+          periodSeconds: 30
           failureThreshold: 5
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
