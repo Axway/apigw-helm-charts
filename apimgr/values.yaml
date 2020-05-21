@@ -9,7 +9,7 @@ global:
   # Defines when to Pull images. This can be "Always", "IfNotPresent" or "Never".
   pullPolicy: Always
   # Docker registry where images are stored.
-  dockerRegistry: docker-registry.demo.axway.com
+  dockerRegistry: <Docker-registry-host>
 
 # This is used as the namespace. It is also combined with environ.id and domain to form the cluster name and domain names.
 # It usually defines a user or customer.
@@ -123,7 +123,7 @@ cassandra:
 
 imageCredentials:
   name: regsecret
-  registry: docker-registry.demo.axway.com
+  registry: <Docker-registry-host>
   # username is the username for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
   username: 
   # password is the password for the registry auth. Should be empty in the values.yaml file, and set in an override file or on the command line
