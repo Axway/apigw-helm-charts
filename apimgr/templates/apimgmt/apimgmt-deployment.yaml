@@ -1,23 +1,24 @@
 {{- if eq .Values.apimgmt.enabled true }}
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   labels:
-    app: apimgmt
-  name: apimgmt
+    app: {{ .Values.apimgmt.name }}
+  name: {{ .Values.apimgmt.name }}
   namespace: {{ .Values.namespace }}
 spec:
-  podManagementPolicy: OrderedReady
   replicas: {{ .Values.apimgmt.replicaCount }}
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: apimgmt
-  serviceName: ""
+      app: {{ .Values.apimgmt.name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
-        app: apimgmt
+        app: {{ .Values.apimgmt.name }}
     spec:
       imagePullSecrets:
         - name: {{ .Values.imageCredentials.name }}
@@ -31,7 +32,7 @@ spec:
                   - key: app
                     operator: In
                     values:
-                    - apimgmt
+                    - {{ .Values.apimgmt.name }}
               topologyKey: kubernetes.io/hostname
       containers:
       - args:
@@ -44,7 +45,7 @@ spec:
         - name: CASS0
           value: {{ .Values.cassandra.host0 }}
         - name: EMT_ANM_HOSTS
-          value: anm-int:8090
+          value: {{ .Values.anm.name }}-int:{{ .Values.anm.trafficPort }}
         - name: EMT_HEAP_SIZE_MB
           value: "{{ .Values.apimgmt.emt_heap_size_mb }}"
         - name: APIGW_LOG_TRACE_TO_FILE
@@ -57,11 +58,10 @@ spec:
           value: "{{ .Values.emtDeployment.enabled }}"
         image: {{ .Values.global.dockerRegistry }}/{{ .Values.apimgmt.imageName }}:{{ .Values.apigw.imageTag }}
         imagePullPolicy: {{ .Values.pullPolicy }}
-        name: apimgmt
+        name: {{ .Values.apimgmt.name }}
         ports:
-        - containerPort: 8075
+        - containerPort: {{ .Values.apimgmt.trafficPort }}
           protocol: TCP
-{{- if eq .Values.quotas.enabled true }}
         resources:
           limits:
             memory: "2Gi"
@@ -69,7 +69,6 @@ spec:
           requests:
             memory: "1Gi"
             cpu: "500m"      
-{{- end }}
         readinessProbe:
           httpGet:
             httpHeaders:
@@ -82,7 +81,7 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
-          failureThreshold: 8
+          failureThreshold: 5
         livenessProbe:
           httpGet:
             httpHeaders:
@@ -92,52 +91,36 @@ spec:
             port: {{ .Values.apimgmt.openPort }}
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          # Adjust periodSeconds for your environment. For demo purpose, this parm is set to a high value
+          periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
           failureThreshold: 5
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       initContainers:
-      - command:
-        - sh
-        - -c
-        - until nc -w 3 -v {{ .Values.cassandra.host0 }} 9042; do echo waiting for cassandra-0; sleep 2; done;
+      - name: init1
         image: {{ .Values.global.initImageTag }}
-        imagePullPolicy: IfNotPresent
-        name: init-cassandra-0
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host0 }} 9042; do echo waiting for {{ .Values.cassandra.host0 }}; sleep 2; done;']
+      # - name: init2
+      #   image: {{ .Values.global.initImageTag }}
+      #   command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host1 }} 9042; do echo waiting for {{ .Values.cassandra.host1 }}; sleep 2; done;']
+      # - name: init3
+      #   image: {{ .Values.global.initImageTag }}
+      #   command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.cassandra.host2 }} 9042; do echo waiting for {{ .Values.cassandra.host2 }}; sleep 2; done;']      
 {{- if eq .Values.mysql.enabled true }}
-      - command:
-        - sh
-        - -c
-        - until nc -w 3 -v {{ .Values.mysql.hostname }} {{ .Values.mysql.port }}; do echo waiting for {{ .Values.mysql.hostname }}; sleep 2; done;
+      - name: init4
         image: {{ .Values.global.initImageTag }}
-        imagePullPolicy: IfNotPresent
-        name: init-mysql
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.mysql.hostname }} 3306; do echo waiting for {{ .Values.mysql.hostname }}; sleep 2; done;']
 {{- end }}
-      - command:
-        - sh
-        - -c
-        - until nc -w 3 -v {{ .Values.anm.name }}-int {{ .Values.anm.trafficPort }}; do echo waiting for anm; sleep 2; done;
+      - name: init5
         image: {{ .Values.global.initImageTag }}
-        imagePullPolicy: IfNotPresent
-        name: init-anm
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
+        command: ['sh', '-c', 'until nc -w 3 -v {{ .Values.anm.name }}-int {{ .Values.anm.trafficPort }}; do echo waiting for anm-int; sleep 2; done;']
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
       terminationGracePeriodSeconds: 30
-  updateStrategy:
-    type: RollingUpdate
 {{- end }}
 

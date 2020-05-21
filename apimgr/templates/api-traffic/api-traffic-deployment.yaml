@@ -1,25 +1,24 @@
-{{- if eq .Values.apimgr.enabled true }}
+{{- if eq .Values.apitraffic.enabled true }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: {{ .Values.apimgr.name }}
-  name: {{ .Values.apimgr.name }}
+    app: {{ .Values.apitraffic.name }}
+  name: {{ .Values.apitraffic.name }}
   namespace: {{ .Values.namespace }}
 spec:
-  replicas: {{ .Values.apimgr.replicaCount }}
+  replicas: {{ .Values.apitraffic.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.apimgr.name }}
+      app: {{ .Values.apitraffic.name }}
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
-    type: {{ .Values.global.updateStrategy }}
+      maxUnavailable: 0
   template:
     metadata:
       labels:
-        app: {{ .Values.apimgr.name }}
+        app: {{ .Values.apitraffic.name }}
     spec:
       imagePullSecrets:
         - name: {{ .Values.imageCredentials.name }}
@@ -33,7 +32,7 @@ spec:
                   - key: app
                     operator: In
                     values:
-                    - {{ .Values.apimgr.name }}
+                    - {{ .Values.apitraffic.name }}
               topologyKey: kubernetes.io/hostname
       containers:
       - args:
@@ -48,37 +47,35 @@ spec:
         - name: EMT_ANM_HOSTS
           value: {{ .Values.anm.name }}-int:{{ .Values.anm.trafficPort }}
         - name: EMT_HEAP_SIZE_MB
-          value: "{{ .Values.apimgr.emt_heap_size_mb }}"
+          value: "{{ .Values.apitraffic.emt_heap_size_mb }}"
         - name: APIGW_LOG_TRACE_TO_FILE
-          value: "{{ .Values.apimgr.logTraceToFile }}"
+          value: "{{ .Values.apitraffic.logTraceToFile }}"
         - name: APIGW_LOG_TRACE_JSON_TO_STDOUT
-          value: "{{ .Values.apimgr.logTraceJSONtoSTDOUT }}"
+          value: "{{ .Values.apitraffic.logTraceJSONtoSTDOUT }}"
         - name: APIGW_LOG_OPENTRAFFIC_OUTPUT
-          value: "{{ .Values.apimgr.logOpenTrafficOutput }}"
+          value: "{{ .Values.apitraffic.logOpenTrafficOutput }}"
         - name: EMT_DEPLOYMENT_ENABLED
           value: "{{ .Values.emtDeployment.enabled }}"
-        image: {{ .Values.global.dockerRegistry }}/{{ .Values.apimgr.imageName }}:{{ .Values.apigw.imageTag }}
+        image: {{ .Values.global.dockerRegistry }}/{{ .Values.apitraffic.imageName }}:{{ .Values.apigw.imageTag }}
         imagePullPolicy: {{ .Values.global.pullPolicy }}
-        name: {{ .Values.apimgr.name }}
+        name: {{ .Values.apitraffic.name }}
         ports:
-        - containerPort: {{ .Values.apimgr.trafficPort }}
+        - containerPort: {{ .Values.apitraffic.trafficPort }}
           protocol: TCP
-{{- if eq .Values.quotas.enabled true }}
         resources:
           limits:
             memory: "2Gi"
             cpu: 2
           requests:
-            memory: "1.5Gi"
-            cpu: 1.5
-{{- end }}
+            memory: "0.5Gi"
+            cpu: 0.5
         readinessProbe:
           httpGet:
             httpHeaders:
             - name: k8sprobe
-              value: readiness.{{ .Values.apimgr.name }}
+              value: readiness.{{ .Values.apitraffic.name }}
             path: /healthcheck
-            port: {{ .Values.apimgr.openPort }}
+            port: {{ .Values.apitraffic.openPort }}
             scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 10
@@ -87,12 +84,13 @@ spec:
           httpGet:
             httpHeaders:
             - name: k8sprobe
-              value: liveness.{{ .Values.apimgr.name }}
+              value: liveness.{{ .Values.apitraffic.name }}
             path: /healthcheck
-            port: {{ .Values.apimgr.openPort }}
+            port: {{ .Values.apitraffic.openPort }}
             scheme: HTTP
           initialDelaySeconds: 10
-          periodSeconds: 10
+          # Adjust periodSeconds for your environment. For demo purpose, this parm is set to a high value
+          periodSeconds: 30
           failureThreshold: 5
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File

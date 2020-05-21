@@ -1,0 +1,24 @@
+{{- if eq .Values.apitraffic.enabled true }}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.apitraffic.name }}
+  name: {{ .Values.apitraffic.name }}-int
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.apitraffic.name }}
+  ports:
+  - name: traffic
+    port: {{ .Values.apitraffic.trafficPort }}
+    targetPort: {{ .Values.apitraffic.trafficPort }}
+    protocol: TCP
+  - name: open
+    port: {{ .Values.apitraffic.openPort }}
+    targetPort: {{ .Values.apitraffic.openPort }}
+    protocol: TCP
+  sessionAffinity: ClientIP
+  type: ClusterIP
+status:
+{{- end }}
