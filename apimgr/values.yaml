@@ -24,7 +24,7 @@ autoscaling:
 
 # If you want to enable NodePort (set to true) instead of Ingress (set to false) to externalize access to APIM components
 nodeport:
-   enabled: false
+   enabled: true
 
 # Same TAG for all Images
 apigw:
