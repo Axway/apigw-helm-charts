@@ -100,7 +100,7 @@ This directory contains a file used to configure Horizontal Pod Autoscaling.
 
 ### cluster-config
 
-This directory contains manifests that define cluster namespace, quotas and default values for resource allocations.
+This directory contains manifests that define cluster namespace and configmap.
 
 ## Deployment
 Once the chart is configured and ready to deploy, it is wise to do a dry-run to ensure there are no issues with the chart. Run this command from the *apimgr* directory:
