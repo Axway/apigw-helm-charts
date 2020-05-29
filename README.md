@@ -74,17 +74,17 @@ This directory contains all the manifest files related to the API Manager UI. Th
 
 **apimgmt-service-ingress.yaml** This is an Ingress configuration assuming you use Nginx as your Ingress controller.
 
-### apimgr
+### api-traffic
 
 This directory contains all the manifest files related to the API Gateway. These pods handle all Gateway Traffic. We run 3 by default, but this can be scaled as needed
 
-**apimgr-deployment:** This defines the apimgr container. On deployment, this container will wait for the anm and apimgmt containers to be ready as well as ensuring all Cassandra hosts are available before initializing. It will also validate MySQL in the same way the anm container will if enabled.
+**api-traffic-deployment:** This defines the apimgr container. On deployment, this container will wait for the anm and apimgmt containers to be ready as well as ensuring all Cassandra hosts are available before initializing. It will also validate MySQL in the same way the anm container will if enabled.
 
-**apimgr-service-int:** This service is used for internal communication within the cluster.
+**api-traffic-service-int:** This service is used for internal communication within the cluster.
 
-**apimgr-service-ext:** This service is used to expose the container externally. There are different options, depending on your needs: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+**api-traffic-service-ext:** This service is used to expose the container externally. There are different options, depending on your needs: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 
-**apimgr-service-ingress.yaml** This is an Ingress configuration assuming you use Nginx as your Ingress controller.
+**api-traffic-service-ingress.yaml** This is an Ingress configuration assuming you use Nginx as your Ingress controller.
 
 ### mysql
 
