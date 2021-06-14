@@ -1,3 +1,6 @@
+# *** **Deprecated** ***
+See [Clout-Automation repo](https://github.com/Axway/Cloud-Automation) for the latest example of an Axway APIM Helm char.
+
 # Axway - API Gateway Helm Chart
 
 As with many Kubernetes solutions, we use helm to manage the deployment of the API Gateway infrastructure. Helm is a very powerful tool that uses a management structure, that it refers to as charts, to define the resources you want to deploy to your Kubernetes cluster. These resources can then be parameterized to enable easy configuration and customization from a single location. Charts can also be divided into sub-charts if some resources may only need to be deployed under certain criteria. While helm notably simplifies the deployment and management of artifacts in a Kubernetes cluster, some familiarity with Kubernetes, it's basic tools and the resources it uses would be desirable to correctly understand what a helm chart does and to be able to troubleshoot in the event of any issues.
